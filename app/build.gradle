@@ -1,0 +1,63 @@
+plugins {
+    id 'com.android.application'
+}
+
+Properties localProps = new Properties()
+localProps.load(new FileInputStream(rootProject.file("local.properties")))
+
+android {
+    namespace 'com.tollfuelpro.app'
+    compileSdk 36
+
+    defaultConfig {
+        applicationId "com.tollfuelpro.app"
+        minSdk 24
+        targetSdk 36
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField "String", "MAPBOX_TOKEN", "\"${localProps['MAPBOX_TOKEN'] ?: ''}\""
+
+        manifestPlaceholders = [
+                MAPBOX_TOKEN: localProps['MAPBOX_TOKEN'] ?: ''
+        ]
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    buildFeatures {
+        buildConfig true
+    }
+}
+
+dependencies {
+    implementation 'androidx.appcompat:appcompat:1.7.1'
+    implementation 'com.google.android.material:material:1.13.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.2.1'
+    implementation 'androidx.recyclerview:recyclerview:1.4.0'
+    implementation 'androidx.cardview:cardview:1.0.0'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel:2.10.0'
+    implementation 'androidx.lifecycle:lifecycle-livedata:2.10.0'
+    
+    // Networking
+    implementation 'com.squareup.okhttp3:okhttp:4.12.0'
+    implementation 'com.google.code.gson:gson:2.13.2'
+    
+    // Image loading
+    implementation 'com.github.bumptech.glide:glide:5.0.5'
+    
+    // Lottie for animations
+    implementation 'com.airbnb.android:lottie:6.7.1'
+}

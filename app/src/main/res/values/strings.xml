@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">TollFuel Pro</string>
+    <string name="tagline">Smart Toll Fee Calculator</string>
+    <string name="calculate_trip">Calculate Trip Cost</string>
+    <string name="get_estimates">Get toll &amp; fuel estimates instantly</string>
+    <string name="total_spent">Total Spent</string>
+    <string name="distance">Distance</string>
+    <string name="trips">Trips</string>
+    <string name="toll_plazas">Toll Plazas</string>
+    <string name="toll_costs">Toll Costs</string>
+    <string name="fuel_costs">Fuel Costs</string>
+    <string name="no_trips_yet">No trips yet</string>
+    <string name="no_trips_subtitle">Start by calculating your first trip cost</string>
+    <string name="select_source">Select source</string>
+    <string name="select_destination">Select destination</string>
+    <string name="vehicle_type">Vehicle Type</string>
+    <string name="trip_type">Trip Type</string>
+    <string name="one_way">One Way</string>
+    <string name="round_trip">Round Trip</string>
+    <string name="fuel_details">Fuel Details</string>
+    <string name="mileage_label">Mileage (km/l)</string>
+    <string name="fuel_price_label">Fuel Price (₹/l)</string>
+    <string name="trip_result">Trip Result</string>
+    <string name="total_trip_cost">Total Trip Cost</string>
+    <string name="toll_cost">Toll Cost</string>
+    <string name="fuel_cost">Fuel Cost</string>
+    <string name="fuel_needed">Fuel Needed</string>
+    <string name="toll_breakdown">Toll Breakdown</string>
+    <string name="share_receipt">Share Receipt</string>
+    <string name="trip_history">Trip History</string>
+    <string name="trips_recorded">trips recorded</string>
+    <string name="clear_history">Clear History</string>
+    <string name="delete_trip_confirm">Delete this trip?</string>
+    <string name="clear_all_confirm">Clear all trips?</string>
+    <string name="cancel">Cancel</string>
+    <string name="delete">Delete</string>
+    <string name="see_all">See All</string>
+    <string name="recent_trips">Recent Trips</string>
+    <string name="error_select_source">Please select a source city</string>
+    <string name="error_select_destination">Please select a destination city</string>
+    <string name="error_same_city">Source and destination cannot be the same</string>
+    <string name="error_network">Network error. Please check your connection.</string>
+    <string name="error_no_route">Could not find a route between these cities.</string>
+    <string name="calculating">Calculating route...</string>
+    <string name="onboarding_title_1">Smart Trip Calculator</string>
+    <string name="onboarding_desc_1">Calculate exact toll plaza costs and fuel expenses before you start your journey.</string>
+    <string name="onboarding_title_2">Track Your History</string>
+    <string name="onboarding_desc_2">Save your trip calculations to easily review your past routes and expenses.</string>
+    <string name="onboarding_title_3">Share Receipts</string>
+    <string name="onboarding_desc_3">Easily generate and share detailed trip cost breakdown receipts with anyone.</string>
+    <string name="skip">Skip</string>
+    <string name="next">Next</string>
+    <string name="get_started">Get Started</string>
+    <string name="fuel_price_text">Fuel Price</string>
+    <string name="zero_rs_per_litre">0 ₹/l</string>
+    <string name="rupee_per_litre_format">%1$s ₹/l</string>
+    <string name="fuel_needed_text">Fuel Needed</string>
+    <string name="zero_litres">0 litres</string>
+    <string name="litres_format">%1$s litres</string>
+    <string name="zero_plazas">0 Plazas</string>
+    <string name="plazas_count_format">%1$d Plazas</string>
+    <string name="plazas_on_route_format">%1$d Toll Plazas on Your Route</string>
+    <string name="total_cost_format">₹%1$s</string>
+    <string name="km_format">%1$s km</string>
+    <string name="km_per_litre_format">%1$s km/l</string>
+    <string name="mileage_format">%1$s km/l</string>
+    <string name="trip_details_format">%1$s • %2$s</string>
+    <string name="km_amount">%1$d km</string>
+    <string name="rupee_amount">₹%1$d</string>
+    <string name="select_source_header">Select Source</string>
+    <string name="select_destination_header">Select Destination</string>
+    <plurals name="trips_recorded_plural">
+        <item quantity="one">%1$d trip recorded</item>
+        <item quantity="other">%1$d trips recorded</item>
+    </plurals>
+    <plurals name="plazas_count_plural">
+        <item quantity="one">%1$d Plaza</item>
+        <item quantity="other">%1$d Plazas</item>
+    </plurals>
+    <string name="enable_location_error">Enable location to calculate real route and toll charges.</string>
+    <string name="error_identify_place">Could not identify place name.</string>
+    <string name="error_geocoding_failed">Geocoding failed: %1$s</string>
+    <string name="error_retrieve_location">Could not retrieve current location. Please try searching.</string>
+    <string name="error_enter_details">Enter mileage and fuel price</string>
+    <string name="error_invalid_details">Invalid fuel details</string>
+    <string name="error_pick_from_suggestions">Please pick locations from suggestions to get valid route</string>
+    <string name="calculate_trip_cost">Calculate Trip Cost</string>
+    <string name="fetching_location">Fetching location...</string>
+    <string name="current_location">📍 Current Location</string>
+    <string name="vehicle_car">Car/Jeep/Van</string>
+    <string name="vehicle_lcv">LCV</string>
+    <string name="vehicle_bus_truck">Bus/Truck</string>
+    <string name="vehicle_3_axle">Upto 3 Axle Vehicle</string>
+    <string name="vehicle_4_6_axle">4 to 6 Axle</string>
+    <string name="vehicle_hcm_eme">HCM/EME</string>
+    <string name="vehicle_7_axle">7 or more Axle</string>
+    <string name="generated_by_app">Generated by TollFuel Pro</string>
+    
+    <!-- Additional strings for layouts -->
+    <string name="smart_toll_calculator">Smart Toll Fee Calculator</string>
+    <string name="trip_calculator">Trip Calculator</string>
+    <string name="enter_journey_details">Enter your journey details</string>
+    <string name="swap">Swap</string>
+    <string name="select_city">Select City</string>
+    <string name="mileage_kml">Mileage (km/l)</string>
+    <string name="default_mileage">15</string>
+    <string name="fuel_price_rs">Fuel Price (₹/l)</string>
+    <string name="default_fuel_price">96.7</string>
+    <string name="trip_result_title">Trip Result</string>
+    <string name="car">Car</string>
+    <string name="one_way_text">One Way</string>
+    <string name="zero_km_per_litre">0 km/l</string>
+    <string name="zero_kml">0 km/l</string>
+    <string name="toll_plazas_breakdown">Toll Plazas Breakdown</string>
+    <string name="route_format">%1$s → %2$s</string>
+    <string name="app_logo_desc">App Logo</string>
+    <string name="powered_by">Powered by</string>
+    <string name="developer_name">Bhupesh Chauhan</string>
+    <string name="zero_trips_recorded">0 trips recorded</string>
+    <string name="delete_all_trips">Delete all trips</string>
+    <string name="your_trips_will_appear_here">Your trips will appear here</string>
+    <string name="hero_subtitle">Calculate toll and fuel for your journey</string>
+    <string name="zero_rupee">₹0</string>
+    <string name="zero_km">0 km</string>
+    <string name="zero_count">0</string>
+    <string name="start_calculating">Start Calculating</string>
+    <string name="source_city">Source City</string>
+    <string name="destination_city">Destination City</string>
+    <string name="mileage">Mileage</string>
+    <string name="nav_home">Home</string>
+    <string name="nav_calculate">Calculate</string>
+    <string name="nav_history">History</string>
+
+    <string-array name="preset_cities">
+        <item>📍 Current Location</item>
+        <item>Mumbai</item>
+        <item>Pune</item>
+        <item>Nashik</item>
+        <item>Nagpur</item>
+        <item>Aurangabad</item>
+        <item>Kolhapur</item>
+        <item>Solapur</item>
+        <item>Satara</item>
+        <item>Shirdi</item>
+        <item>Lonavala</item>
+        <item>Surat</item>
+        <item>Ahmedabad</item>
+        <item>Hyderabad</item>
+        <item>Bangalore</item>
+        <item>Delhi</item>
+        <item>Jaipur</item>
+        <item>Indore</item>
+        <item>Bhopal</item>
+        <item>Lucknow</item>
+        <item>Patna</item>
+    </string-array>
+</resources>

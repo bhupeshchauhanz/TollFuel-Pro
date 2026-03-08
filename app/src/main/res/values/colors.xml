@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="bg_primary">#0B0F14</color>
+    <color name="bg_card">#121922</color>
+    <color name="bg_card_dark">#161B22</color>
+    <color name="bg_accent_dark">#1E3A2F</color>
+    <color name="accent">#00E6A8</color>
+    <color name="text_primary">#FFFFFF</color>
+    <color name="text_secondary">#A0AEC0</color>
+    <color name="text_hint">#55667A</color>
+    <color name="danger">#FF4444</color>
+    <color name="orange">#FF8C00</color>
+    <color name="blue">#4A90E2</color>
+    <color name="purple">#9B59B6</color>
+    <color name="divider">#2A3441</color>
+    
+    <!-- Trip Result Redesign Theme Colors -->
+    <color name="tr_bg_dark">#0E1218</color>
+    <color name="tr_bg_card">#151B23</color>
+    <color name="tr_accent_green">#32D583</color>
+    <color name="tr_accent_red">#F04438</color>
+    
+    <!-- Tooltip specific colors -->
+    <color name="tooltip_bg">#151B23</color>
+    <color name="tooltip_accent">#32D583</color>
+</resources>
