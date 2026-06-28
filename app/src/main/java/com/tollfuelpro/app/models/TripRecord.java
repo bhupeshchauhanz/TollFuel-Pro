@@ -17,6 +17,15 @@ public class TripRecord {
     private double fuelNeeded;
     private List<TollResult> tollResults;
     private long timestamp;
+    private String routeGeometry;
+    private double srcLat, srcLng, dstLat, dstLng;
+
+    private String fuelType;
+    private boolean fuelCostIncluded;
+    private double batteryCapacityKwh;
+    private double evRangeKm;
+    private double chargeLevelPercent;
+    private double costPerKwh;
 
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
@@ -60,7 +69,40 @@ public class TripRecord {
     public long getTimestamp() { return timestamp; }
     public void setTimestamp(long timestamp) { this.timestamp = timestamp; }
 
+    public String getRouteGeometry() { return routeGeometry; }
+    public void setRouteGeometry(String routeGeometry) { this.routeGeometry = routeGeometry; }
+
+    public double getSrcLat() { return srcLat; }
+    public void setSrcLat(double srcLat) { this.srcLat = srcLat; }
+
+    public double getSrcLng() { return srcLng; }
+    public void setSrcLng(double srcLng) { this.srcLng = srcLng; }
+
+    public double getDstLat() { return dstLat; }
+    public void setDstLat(double dstLat) { this.dstLat = dstLat; }
+
+    public double getDstLng() { return dstLng; }
+    public void setDstLng(double dstLng) { this.dstLng = dstLng; }
+
     public boolean isRoundTrip() {
         return "Round Trip".equalsIgnoreCase(this.tripType);
     }
+
+    public String getFuelType() { return fuelType; }
+    public void setFuelType(String fuelType) { this.fuelType = fuelType; }
+
+    public boolean isFuelCostIncluded() { return fuelCostIncluded; }
+    public void setFuelCostIncluded(boolean fuelCostIncluded) { this.fuelCostIncluded = fuelCostIncluded; }
+
+    public double getBatteryCapacityKwh() { return batteryCapacityKwh; }
+    public void setBatteryCapacityKwh(double batteryCapacityKwh) { this.batteryCapacityKwh = batteryCapacityKwh; }
+
+    public double getEvRangeKm() { return evRangeKm; }
+    public void setEvRangeKm(double evRangeKm) { this.evRangeKm = evRangeKm; }
+
+    public double getChargeLevelPercent() { return chargeLevelPercent; }
+    public void setChargeLevelPercent(double chargeLevelPercent) { this.chargeLevelPercent = chargeLevelPercent; }
+
+    public double getCostPerKwh() { return costPerKwh; }
+    public void setCostPerKwh(double costPerKwh) { this.costPerKwh = costPerKwh; }
 }

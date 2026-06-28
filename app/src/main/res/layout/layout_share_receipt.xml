@@ -140,6 +140,20 @@
                 tools:text="0 km"
                 android:textColor="@color/text_secondary"
                 android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/chip_fuel_type"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/bg_chip"
+                android:backgroundTint="#2A1F38"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="4dp"
+                android:text="@string/petrol"
+                android:textColor="@color/text_secondary"
+                android:textSize="12sp"
+                android:visibility="gone" />
         </LinearLayout>
     </LinearLayout>
 
@@ -266,6 +280,7 @@
         android:layout_marginBottom="24dp">
 
         <LinearLayout
+            android:id="@+id/layout_mileage_row"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
@@ -294,6 +309,7 @@
             android:layout_marginBottom="12dp"/>
 
         <LinearLayout
+            android:id="@+id/layout_fuel_price_row"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"

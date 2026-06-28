@@ -411,10 +411,11 @@
         <LinearLayout
             android:id="@+id/layout_empty_state"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginTop="48dp"
             android:gravity="center"
             android:orientation="vertical"
+            android:minHeight="240dp"
             android:visibility="visible">
 
             <ImageView

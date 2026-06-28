@@ -33,8 +33,12 @@ import com.tollfuelpro.app.utils.TripCalculator;
 public class CalculateFragment extends Fragment {
 
     private EditText etSource, etDestination, etMileage, etFuelPrice;
+    private EditText etBatteryCapacity, etChargeLevel, etCostPerKwh, etEvRange;
     private android.widget.Spinner spinnerVehicleType;
     private TextView tvOneWay, tvRoundTrip;
+    private TextView tvFuelPetrol, tvFuelDiesel, tvFuelEV;
+    private LinearLayout layoutFuelFields, layoutEVFields;
+    private android.widget.CheckBox cbIncludeFuel;
     private Button btnCalculate;
     private ProgressBar pbCalculate;
 
@@ -44,13 +48,17 @@ public class CalculateFragment extends Fragment {
     private RecyclerView rvMapboxSuggestions;
 
     private String selectedVehicle = "Car/Jeep/Van";
+    private String selectedFuelType = "petrol";
     private boolean isRoundTrip = false;
 
-    // Stored coordinates
     private double srcLat = 0, srcLng = 0;
     private double dstLat = 0, dstLng = 0;
 
     private boolean isSettingSource = true;
+
+    private okhttp3.Call activeDirectionsCall;
+    private final java.util.List<okhttp3.Call> activeGeocodingCalls = new java.util.ArrayList<>();
+    private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
     @Nullable
     @Override
@@ -60,6 +68,7 @@ public class CalculateFragment extends Fragment {
         initViews(view);
         setupVehicleSelection();
         setupTripTypeSelection();
+        setupFuelTypeSelection();
         setupCalculateAction();
         setupLocationInput();
         return view;
@@ -70,9 +79,20 @@ public class CalculateFragment extends Fragment {
         etDestination = view.findViewById(R.id.et_destination);
         etMileage = view.findViewById(R.id.et_mileage);
         etFuelPrice = view.findViewById(R.id.et_fuel_price);
+        etBatteryCapacity = view.findViewById(R.id.et_battery_capacity);
+        etChargeLevel = view.findViewById(R.id.et_charge_level);
+        etCostPerKwh = view.findViewById(R.id.et_cost_per_kwh);
+        etEvRange = view.findViewById(R.id.et_ev_range);
 
         tvOneWay = view.findViewById(R.id.tv_trip_one_way);
         tvRoundTrip = view.findViewById(R.id.tv_trip_round);
+
+        tvFuelPetrol = view.findViewById(R.id.tv_fuel_petrol);
+        tvFuelDiesel = view.findViewById(R.id.tv_fuel_diesel);
+        tvFuelEV = view.findViewById(R.id.tv_fuel_ev);
+        layoutFuelFields = view.findViewById(R.id.layout_fuel_fields);
+        layoutEVFields = view.findViewById(R.id.layout_ev_fields);
+        cbIncludeFuel = view.findViewById(R.id.cb_include_fuel);
 
         btnCalculate = view.findViewById(R.id.btn_calculate);
         pbCalculate = view.findViewById(R.id.pb_calculate);
@@ -134,6 +154,28 @@ public class CalculateFragment extends Fragment {
         // Final trip type labels
         tvOneWay.setText(R.string.one_way);
         tvRoundTrip.setText(R.string.round_trip);
+    }
+
+    private void setupFuelTypeSelection() {
+        tvFuelPetrol.setOnClickListener(v -> selectFuelType("petrol", tvFuelPetrol));
+        tvFuelDiesel.setOnClickListener(v -> selectFuelType("diesel", tvFuelDiesel));
+        tvFuelEV.setOnClickListener(v -> selectFuelType("ev", tvFuelEV));
+        selectFuelType("petrol", tvFuelPetrol);
+    }
+
+    private void selectFuelType(String fuelType, TextView selected) {
+        selectedFuelType = fuelType;
+        TextView[] all = { tvFuelPetrol, tvFuelDiesel, tvFuelEV };
+        for (TextView tv : all) {
+            boolean isSelected = tv == selected;
+            tv.setBackgroundResource(isSelected ? R.drawable.bg_trip_type_selected : R.drawable.bg_trip_type_unselected);
+            tv.setTextColor(ContextCompat.getColor(requireContext(),
+                    isSelected ? R.color.text_primary : R.color.text_secondary));
+        }
+        boolean isEv = "ev".equals(fuelType);
+        layoutFuelFields.setVisibility(isEv ? View.GONE : View.VISIBLE);
+        layoutEVFields.setVisibility(isEv ? View.VISIBLE : View.GONE);
+        cbIncludeFuel.setVisibility(isEv ? View.GONE : View.VISIBLE);
     }
 
     private void swapLocations() {
@@ -332,7 +374,7 @@ public class CalculateFragment extends Fragment {
                 else
                     etDestination.setText(getString(R.string.fetching_location));
 
-                MapboxService.reverseGeocode(lat, lng, new MapboxService.GeocodingCallback() {
+                okhttp3.Call geoCall = MapboxService.reverseGeocode(lat, lng, new MapboxService.GeocodingCallback() {
                     @Override
                     public void onResults(java.util.List<MapboxService.GeocodingResult> results) {
                         new Handler(Looper.getMainLooper()).post(() -> {
@@ -363,6 +405,9 @@ public class CalculateFragment extends Fragment {
                         });
                     }
                 });
+                if (geoCall != null) {
+                    activeGeocodingCalls.add(geoCall);
+                }
             } else {
                 showError(getString(R.string.error_retrieve_location));
             }
@@ -409,15 +454,37 @@ public class CalculateFragment extends Fragment {
                 showError(getString(R.string.error_same_city));
                 return;
             }
-            if (milStr.isEmpty() || fuelStr.isEmpty()) {
-                showError(getString(R.string.error_enter_details));
-                return;
+
+            boolean isEv = "ev".equals(selectedFuelType);
+
+            if (isEv) {
+                String batStr = etBatteryCapacity.getText().toString().trim();
+                String chgStr = etChargeLevel.getText().toString().trim();
+                String kwhStr = etCostPerKwh.getText().toString().trim();
+                String rangeStr = etEvRange.getText().toString().trim();
+                if (batStr.isEmpty() || chgStr.isEmpty() || kwhStr.isEmpty() || rangeStr.isEmpty()) {
+                    showError(getString(R.string.error_enter_details));
+                    return;
+                }
+            } else {
+                if (milStr.isEmpty() || fuelStr.isEmpty()) {
+                    showError(getString(R.string.error_enter_details));
+                    return;
+                }
             }
 
-            double mileage = Double.parseDouble(milStr);
-            double fuelPrice = Double.parseDouble(fuelStr);
+            double mileage = milStr.isEmpty() ? 0 : Double.parseDouble(milStr);
+            double fuelPrice = fuelStr.isEmpty() ? 0 : Double.parseDouble(fuelStr);
+            double batteryCapacityKwh = etBatteryCapacity.getText().toString().trim().isEmpty() ? 0
+                    : Double.parseDouble(etBatteryCapacity.getText().toString().trim());
+            double chargeLevelPercent = etChargeLevel.getText().toString().trim().isEmpty() ? 0
+                    : Double.parseDouble(etChargeLevel.getText().toString().trim());
+            double costPerKwh = etCostPerKwh.getText().toString().trim().isEmpty() ? 0
+                    : Double.parseDouble(etCostPerKwh.getText().toString().trim());
+            double evRangeKm = etEvRange.getText().toString().trim().isEmpty() ? 0
+                    : Double.parseDouble(etEvRange.getText().toString().trim());
 
-            if (mileage <= 0 || fuelPrice <= 0) {
+            if (!isEv && (mileage <= 0 || fuelPrice <= 0)) {
                 showError(getString(R.string.error_invalid_details));
                 return;
             }
@@ -427,24 +494,19 @@ public class CalculateFragment extends Fragment {
                 return;
             }
 
-            if (androidx.core.content.ContextCompat.checkSelfPermission(requireContext(),
-                    android.Manifest.permission.ACCESS_FINE_LOCATION) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
-                showError(getString(R.string.enable_location_error));
-                requestPermissions(new String[] { android.Manifest.permission.ACCESS_FINE_LOCATION,
-                        android.Manifest.permission.ACCESS_COARSE_LOCATION }, 100);
-                return;
-            }
-
             if (!isNetworkAvailable()) {
                 showError(getString(R.string.error_network));
                 return;
             }
 
+            boolean includeFuelCost = cbIncludeFuel.isChecked();
+            String fuelType = selectedFuelType;
+
             btnCalculate.setText("");
             btnCalculate.setEnabled(false);
             pbCalculate.setVisibility(View.VISIBLE);
 
-            MapboxService.getDrivingDistance(srcLat, srcLng, dstLat, dstLng, new MapboxService.DirectionsCallback() {
+            activeDirectionsCall = MapboxService.getDrivingDistance(srcLat, srcLng, dstLat, dstLng, new MapboxService.DirectionsCallback() {
                 @Override
                 public void onResult(double distanceKm, java.util.List<String> routeKeywords, String routeGeometry) {
                     java.util.List<com.tollfuelpro.app.utils.PolylineUtils.LatLng> path = com.tollfuelpro.app.utils.PolylineUtils
@@ -464,22 +526,29 @@ public class CalculateFragment extends Fragment {
                     }
 
                     java.util.List<String> geoKeywords = new java.util.concurrent.CopyOnWriteArrayList<>(routeKeywords);
+                    java.util.List<String> routeStates = new java.util.concurrent.CopyOnWriteArrayList<>();
                     java.util.concurrent.atomic.AtomicInteger counter = new java.util.concurrent.atomic.AtomicInteger(
                             samples.size());
 
                     if (samples.isEmpty()) {
-                        finishCalculation(distanceKm, geoKeywords);
+                        finishCalculation(distanceKm, geoKeywords, routeStates, routeGeometry);
                         return;
                     }
 
                     for (com.tollfuelpro.app.utils.PolylineUtils.LatLng pt : samples) {
-                        MapboxService.reverseGeocode(pt.lat, pt.lng, new MapboxService.GeocodingCallback() {
+                        okhttp3.Call geoCall = MapboxService.reverseGeocode(pt.lat, pt.lng, new MapboxService.GeocodingCallback() {
                             @Override
                             public void onResults(java.util.List<MapboxService.GeocodingResult> results) {
                                 for (MapboxService.GeocodingResult r : results) {
                                     if (r.placeName != null) {
                                         for (String part : r.placeName.split(",")) {
                                             geoKeywords.add(part.trim());
+                                        }
+                                    }
+                                    if (r.state != null && !r.state.isEmpty()) {
+                                        String stateLow = r.state.toLowerCase(java.util.Locale.ROOT).trim();
+                                        if (!routeStates.contains(stateLow)) {
+                                            routeStates.add(stateLow);
                                         }
                                     }
                                 }
@@ -493,25 +562,30 @@ public class CalculateFragment extends Fragment {
 
                             private void checkFinish() {
                                 if (counter.decrementAndGet() == 0) {
-                                    finishCalculation(distanceKm, geoKeywords);
+                                    finishCalculation(distanceKm, geoKeywords, routeStates, routeGeometry);
                                 }
                             }
                         });
+                        if (geoCall != null) {
+                            activeGeocodingCalls.add(geoCall);
+                        }
                     }
                 }
 
-                private void finishCalculation(double distanceKm, java.util.List<String> finalKeywords) {
+                private void finishCalculation(double distanceKm, java.util.List<String> finalKeywords, java.util.List<String> finalRouteStates, String routeGeometry) {
                     new Handler(Looper.getMainLooper()).post(() -> {
                         TripRecord record = TripCalculator.calculate(
                                 requireContext(), src, dst, srcLat, srcLng, dstLat, dstLng,
-                                distanceKm, finalKeywords, selectedVehicle, isRoundTrip, mileage, fuelPrice);
+                                distanceKm, finalKeywords, finalRouteStates, selectedVehicle, isRoundTrip,
+                                mileage, fuelPrice, routeGeometry, fuelType, includeFuelCost,
+                                batteryCapacityKwh, chargeLevelPercent, costPerKwh, evRangeKm);
                         StorageService.saveTrip(requireContext(), record);
 
                         btnCalculate.setText(getString(R.string.calculate_trip_cost));
                         btnCalculate.setEnabled(true);
                         pbCalculate.setVisibility(View.GONE);
 
-                        // Launch TripResultFragment
+                        if (!isAdded() || getActivity() == null) return;
                         TripResultFragment resultFragment = TripResultFragment.newInstance(record);
                         requireActivity().getSupportFragmentManager().beginTransaction()
                                 .replace(R.id.fragment_container, resultFragment)
@@ -542,10 +616,38 @@ public class CalculateFragment extends Fragment {
         return false;
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+            @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 100 && grantResults.length > 0
+                && grantResults[0] == android.content.pm.PackageManager.PERMISSION_GRANTED) {
+            fetchCurrentLocation();
+        } else if (requestCode == 100) {
+            showError(getString(R.string.enable_location_error));
+        }
+    }
+
     private void showError(String msg) {
+        if (!isAdded() || getView() == null) return;
         Snackbar snackbar = Snackbar.make(requireView(), msg, Snackbar.LENGTH_LONG);
         snackbar.setBackgroundTint(ContextCompat.getColor(requireContext(), R.color.danger));
         snackbar.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_primary));
         snackbar.show();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        mainHandler.removeCallbacksAndMessages(null);
+        if (activeDirectionsCall != null) {
+            activeDirectionsCall.cancel();
+        }
+        for (okhttp3.Call call : activeGeocodingCalls) {
+            if (call != null && !call.isCanceled()) {
+                call.cancel();
+            }
+        }
+        activeGeocodingCalls.clear();
     }
 }

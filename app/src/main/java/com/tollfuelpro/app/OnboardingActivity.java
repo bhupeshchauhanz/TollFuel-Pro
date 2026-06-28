@@ -14,6 +14,8 @@ import androidx.core.content.ContextCompat;
 import androidx.viewpager2.widget.ViewPager2;
 import java.util.ArrayList;
 import java.util.List;
+import com.tollfuelpro.app.adapters.OnboardingAdapter;
+import com.tollfuelpro.app.models.OnboardingItem;
 
 public class OnboardingActivity extends AppCompatActivity {
 

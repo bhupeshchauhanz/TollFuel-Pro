@@ -7,6 +7,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.tollfuelpro.app.fragments.CalculateFragment;
 import com.tollfuelpro.app.fragments.HistoryFragment;
 import com.tollfuelpro.app.fragments.HomeFragment;
+import com.tollfuelpro.app.fragments.RouteMapFragment;
 
 public class MainActivity extends AppCompatActivity {
     @Override
@@ -24,6 +25,8 @@ public class MainActivity extends AppCompatActivity {
                 selectedFragment = new CalculateFragment();
             } else if (id == R.id.nav_history) {
                 selectedFragment = new HistoryFragment();
+            } else if (id == R.id.nav_map) {
+                selectedFragment = new RouteMapFragment();
             }
             if (selectedFragment != null) {
                 getSupportFragmentManager().beginTransaction()

@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -16,6 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.google.gson.Gson;
 import com.tollfuelpro.app.R;
+import com.tollfuelpro.app.fragments.RouteMapFragment;
 import com.tollfuelpro.app.models.TripRecord;
 import com.tollfuelpro.app.adapters.TollBreakdownAdapter;
 import android.animation.ValueAnimator;
@@ -42,6 +44,9 @@ public class TripResultFragment extends Fragment {
     private View cardRoute, cardTotalCost, cardCostsRow, cardFuelDetails, layoutTollTitle, rvTollPlazasView;
     private TextView tvSource, tvDestination, tvChipVehicle, tvChipTripType, tvChipDistance, tvMileageVal,
             tvFuelPriceVal, tvFuelNeededVal;
+    private TextView tvChipFuelType, tvFuelBadge;
+    private LinearLayout layoutEvDetails;
+    private TextView tvBatteryVal, tvChargeVal, tvCostPerKwhVal;
 
     public static TripResultFragment newInstance(TripRecord record) {
         TripResultFragment fragment = new TripResultFragment();
@@ -92,6 +97,13 @@ public class TripResultFragment extends Fragment {
         tvFuelPriceVal = view.findViewById(R.id.tv_fuel_price_val);
         tvFuelNeededVal = view.findViewById(R.id.tv_fuel_needed_val);
 
+        tvChipFuelType = view.findViewById(R.id.chip_fuel_type);
+        tvFuelBadge = view.findViewById(R.id.tv_fuel_badge);
+        layoutEvDetails = view.findViewById(R.id.layout_ev_details);
+        tvBatteryVal = view.findViewById(R.id.tv_battery_val);
+        tvChargeVal = view.findViewById(R.id.tv_charge_val);
+        tvCostPerKwhVal = view.findViewById(R.id.tv_cost_per_kwh_val);
+
         cardRoute = view.findViewById(R.id.card_route);
         cardTotalCost = view.findViewById(R.id.card_total_cost);
         cardCostsRow = view.findViewById(R.id.card_costs_row);
@@ -99,6 +111,7 @@ public class TripResultFragment extends Fragment {
         layoutTollTitle = view.findViewById(R.id.layout_toll_title);
         rvTollPlazas.setLayoutManager(new LinearLayoutManager(requireContext()));
 
+        view.findViewById(R.id.btn_view_map).setOnClickListener(v -> openMap());
         view.findViewById(R.id.btn_share_header).setOnClickListener(v -> shareBreakdown());
         view.findViewById(R.id.btn_share_main).setOnClickListener(v -> shareBreakdown());
     }
@@ -109,14 +122,17 @@ public class TripResultFragment extends Fragment {
 
         for (int i = 0; i < animatedViews.length; i++) {
             View v = animatedViews[i];
-            v.setTranslationY(80f);
+            v.setTranslationY(60f);
             v.setAlpha(0f);
+            v.setLayerType(View.LAYER_TYPE_HARDWARE, null);
             v.animate()
                     .translationY(0f)
                     .alpha(1f)
-                    .setStartDelay(100 + (i * 100))
-                    .setDuration(600)
-                    .setInterpolator(new android.view.animation.DecelerateInterpolator(1.5f))
+                    .setStartDelay(80 + (i * 80))
+                    .setDuration(400)
+                    .setInterpolator(new android.view.animation.DecelerateInterpolator(1.2f))
+                    .withLayer()
+                    .withEndAction(() -> v.setLayerType(View.LAYER_TYPE_NONE, null))
                     .start();
         }
     }
@@ -143,13 +159,46 @@ public class TripResultFragment extends Fragment {
         tvTollCost.setText(getString(R.string.rupee_amount, (int) tripRecord.getTollCost()));
         tvFuelCost.setText(getString(R.string.rupee_amount, (int) tripRecord.getFuelCost()));
 
-        tvMileageVal.setText(getString(R.string.mileage_format, String.valueOf(tripRecord.getMileage())));
-        tvFuelPriceVal.setText(getString(R.string.rupee_per_litre_format, String.valueOf(tripRecord.getFuelPricePerLitre())));
+        String fuelType = tripRecord.getFuelType();
+        boolean isEv = "ev".equals(fuelType);
 
-        double fuelNeeded = tripRecord.getDistanceKm() / tripRecord.getMileage();
-        if (tripRecord.isRoundTrip())
-            fuelNeeded *= 2;
-        tvFuelNeededVal.setText(getString(R.string.litres_format, String.format(java.util.Locale.getDefault(), "%.1f", fuelNeeded)));
+        if (fuelType != null) {
+            tvChipFuelType.setVisibility(View.VISIBLE);
+            if (isEv) {
+                tvChipFuelType.setText(R.string.vehicle_ev);
+            } else {
+                tvChipFuelType.setText("petrol".equals(fuelType) ? R.string.petrol : R.string.diesel);
+            }
+        }
+
+        if (tripRecord.isFuelCostIncluded()) {
+            tvFuelBadge.setVisibility(View.VISIBLE);
+            tvFuelBadge.setText(R.string.fuel_included);
+        } else {
+            tvFuelBadge.setVisibility(View.VISIBLE);
+            tvFuelBadge.setText(R.string.fuel_excluded_short);
+        }
+
+        if (isEv) {
+            tvMileageVal.setVisibility(View.GONE);
+            tvFuelPriceVal.setVisibility(View.GONE);
+            tvFuelNeededVal.setText(getString(R.string.litres_format,
+                    String.format(java.util.Locale.getDefault(), "%.1f kWh", tripRecord.getFuelNeeded())));
+            layoutEvDetails.setVisibility(View.VISIBLE);
+            tvBatteryVal.setText(String.format(java.util.Locale.getDefault(), "%.0f kWh", tripRecord.getBatteryCapacityKwh()));
+            tvChargeVal.setText(String.format(java.util.Locale.getDefault(), "%.0f%%", tripRecord.getChargeLevelPercent()));
+            tvCostPerKwhVal.setText(String.format(java.util.Locale.getDefault(), "₹%.2f", tripRecord.getCostPerKwh()));
+        } else {
+            tvMileageVal.setVisibility(View.VISIBLE);
+            tvFuelPriceVal.setVisibility(View.VISIBLE);
+            tvMileageVal.setText(getString(R.string.mileage_format, String.valueOf(tripRecord.getMileage())));
+            tvFuelPriceVal.setText(getString(R.string.rupee_per_litre_format, String.valueOf(tripRecord.getFuelPricePerLitre())));
+            double fuelNeeded = tripRecord.getDistanceKm() / tripRecord.getMileage();
+            if (tripRecord.isRoundTrip())
+                fuelNeeded *= 2;
+            tvFuelNeededVal.setText(getString(R.string.litres_format, String.format(java.util.Locale.getDefault(), "%.1f", fuelNeeded)));
+            layoutEvDetails.setVisibility(View.GONE);
+        }
 
         tvPlazasCount.setText(getResources().getQuantityString(R.plurals.plazas_count_plural, tripRecord.getTollResults().size(), tripRecord.getTollResults().size()));
 
@@ -190,6 +239,15 @@ public class TripResultFragment extends Fragment {
         dialog.show();
     }
 
+    private void openMap() {
+        if (tripRecord == null || getActivity() == null) return;
+        RouteMapFragment mapFragment = RouteMapFragment.newInstance(tripRecord);
+        requireActivity().getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, mapFragment)
+                .addToBackStack(null)
+                .commit();
+    }
+
     private void shareBreakdown() {
         if (tripRecord == null || getContext() == null)
             return;
@@ -208,18 +266,41 @@ public class TripResultFragment extends Fragment {
                 getString(R.string.trip_details_format, shareVehicleType, shareTripType));
         ((TextView) receiptView.findViewById(R.id.chip_trip_type)).setText(shareTripType);
         ((TextView) receiptView.findViewById(R.id.chip_distance)).setText(getString(R.string.km_amount, (int) tripRecord.getDistanceKm()));
+
+        String fuelType = tripRecord.getFuelType();
+        if (fuelType != null) {
+            TextView chipFuelType = receiptView.findViewById(R.id.chip_fuel_type);
+            chipFuelType.setVisibility(View.VISIBLE);
+            chipFuelType.setText("ev".equals(fuelType) ? R.string.vehicle_ev
+                    : "petrol".equals(fuelType) ? R.string.petrol : R.string.diesel);
+        }
+
         ((TextView) receiptView.findViewById(R.id.tv_total_cost)).setText(getString(R.string.rupee_amount, (int) tripRecord.getTotalCost()));
         ((TextView) receiptView.findViewById(R.id.tv_toll_cost)).setText(getString(R.string.rupee_amount, (int) tripRecord.getTollCost()));
         ((TextView) receiptView.findViewById(R.id.tv_fuel_cost)).setText(getString(R.string.rupee_amount, (int) tripRecord.getFuelCost()));
-        ((TextView) receiptView.findViewById(R.id.tv_mileage_val)).setText(getString(R.string.mileage_format, String.valueOf(tripRecord.getMileage())));
-        ((TextView) receiptView.findViewById(R.id.tv_fuel_price_val))
-                .setText(getString(R.string.rupee_per_litre_format, String.valueOf(tripRecord.getFuelPricePerLitre())));
 
-        double fuelNeeded = tripRecord.getDistanceKm() / tripRecord.getMileage();
-        if (tripRecord.isRoundTrip())
-            fuelNeeded *= 2;
-        ((TextView) receiptView.findViewById(R.id.tv_fuel_needed_val))
-                .setText(getString(R.string.litres_format, String.format(java.util.Locale.getDefault(), "%.1f", fuelNeeded)));
+        boolean isEv = "ev".equals(fuelType);
+        if (isEv) {
+            receiptView.findViewById(R.id.tv_mileage_val).setVisibility(View.GONE);
+            receiptView.findViewById(R.id.layout_mileage_row).setVisibility(View.GONE);
+            receiptView.findViewById(R.id.layout_fuel_price_row).setVisibility(View.GONE);
+            receiptView.findViewById(R.id.tv_fuel_price_val).setVisibility(View.GONE);
+            ((TextView) receiptView.findViewById(R.id.tv_fuel_needed_val))
+                    .setText(String.format(java.util.Locale.getDefault(), "%.1f kWh", tripRecord.getFuelNeeded()));
+        } else {
+            receiptView.findViewById(R.id.tv_mileage_val).setVisibility(View.VISIBLE);
+            receiptView.findViewById(R.id.layout_mileage_row).setVisibility(View.VISIBLE);
+            receiptView.findViewById(R.id.layout_fuel_price_row).setVisibility(View.VISIBLE);
+            receiptView.findViewById(R.id.tv_fuel_price_val).setVisibility(View.VISIBLE);
+            ((TextView) receiptView.findViewById(R.id.tv_mileage_val)).setText(getString(R.string.mileage_format, String.valueOf(tripRecord.getMileage())));
+            ((TextView) receiptView.findViewById(R.id.tv_fuel_price_val))
+                    .setText(getString(R.string.rupee_per_litre_format, String.valueOf(tripRecord.getFuelPricePerLitre())));
+            double fuelNeeded = tripRecord.getDistanceKm() / tripRecord.getMileage();
+            if (tripRecord.isRoundTrip())
+                fuelNeeded *= 2;
+            ((TextView) receiptView.findViewById(R.id.tv_fuel_needed_val))
+                    .setText(getString(R.string.litres_format, String.format(java.util.Locale.getDefault(), "%.1f", fuelNeeded)));
+        }
 
         // Populate highlight box
         int plazasCount = tripRecord.getTollResults() != null ? tripRecord.getTollResults().size() : 0;
@@ -252,9 +333,10 @@ public class TripResultFragment extends Fragment {
             Uri imageUri = FileProvider.getUriForFile(requireContext(),
                     requireContext().getPackageName() + ".fileprovider", imageFile);
 
+            String fuelLabel = tripRecord.isFuelCostIncluded() ? "Fuel Included" : "Toll Only";
             String shareText = "My Trip Estimation via TollFuel Pro\n" +
                     "Route: " + tripRecord.getSource() + " to " + tripRecord.getDestination() + "\n" +
-                    "Total Cost: ₹" + (int) tripRecord.getTotalCost() + "\n" +
+                    "Total Cost: ₹" + (int) tripRecord.getTotalCost() + " (" + fuelLabel + ")\n" +
                     "(Toll: ₹" + (int) tripRecord.getTollCost() + ", Fuel: ₹" + (int) tripRecord.getFuelCost() + ")";
 
             Intent sendIntent = new Intent();

@@ -18,13 +18,21 @@ public class TripCalculator {
             double dstLat, double dstLng,
             double distanceKm,
             java.util.List<String> routeKeywords,
+            java.util.List<String> routeStates,
             String vehicleType,
             boolean isRoundTrip,
             double mileage,
-            double fuelPrice) {
+            double fuelPrice,
+            String routeGeometry,
+            String fuelType,
+            boolean includeFuelCost,
+            double batteryCapacityKwh,
+            double chargeLevelPercent,
+            double costPerKwh,
+            double evRangeKm) {
 
         List<TollPlaza> matchedTolls =
-            TollDataService.findTollsOnRoute(ctx, source, destination, routeKeywords);
+            TollDataService.findTollsOnRoute(ctx, source, destination, routeKeywords, routeStates);
 
         List<TollResult> tollResults = new ArrayList<>();
         double totalTollCost = 0;
@@ -45,8 +53,22 @@ public class TripCalculator {
         }
 
         double effectiveDistance = isRoundTrip ? distanceKm * 2 : distanceKm;
-        double fuelNeeded = effectiveDistance / mileage;
-        double fuelCost = Math.round(fuelNeeded * fuelPrice);
+        double fuelNeeded = 0;
+        double fuelCost = 0;
+
+        if ("ev".equals(fuelType)) {
+            double effectiveRange = evRangeKm * (chargeLevelPercent / 100.0);
+            double energyNeeded = batteryCapacityKwh * (effectiveDistance / evRangeKm);
+            fuelNeeded = energyNeeded;
+            fuelCost = Math.round(energyNeeded * costPerKwh);
+        } else {
+            fuelNeeded = effectiveDistance / mileage;
+            fuelCost = Math.round(fuelNeeded * fuelPrice);
+        }
+
+        if (!includeFuelCost) {
+            fuelCost = 0;
+        }
 
         TripRecord record = new TripRecord();
         record.setId(UUID.randomUUID().toString());
@@ -63,6 +85,17 @@ public class TripCalculator {
         record.setFuelNeeded(Math.round(fuelNeeded * 10.0) / 10.0);
         record.setTollResults(tollResults);
         record.setTimestamp(System.currentTimeMillis());
+        record.setRouteGeometry(routeGeometry);
+        record.setSrcLat(srcLat);
+        record.setSrcLng(srcLng);
+        record.setDstLat(dstLat);
+        record.setDstLng(dstLng);
+        record.setFuelType(fuelType);
+        record.setFuelCostIncluded(includeFuelCost);
+        record.setBatteryCapacityKwh(batteryCapacityKwh);
+        record.setEvRangeKm(evRangeKm);
+        record.setChargeLevelPercent(chargeLevelPercent);
+        record.setCostPerKwh(costPerKwh);
         
         return record;
     }

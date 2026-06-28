@@ -95,6 +95,7 @@ public class HistoryFragment extends Fragment {
     }
 
     private void showTripDetails(TripRecord trip) {
+        if (!isAdded() || getActivity() == null) return;
         TripResultFragment fragment = TripResultFragment.newInstance(trip);
         requireActivity().getSupportFragmentManager().beginTransaction()
             .replace(R.id.fragment_container, fragment)

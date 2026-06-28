@@ -1,13 +1,11 @@
 # Build outputs
 /build/
 /app/build/
-*.apk
 *.aab
 
 # Gradle
 .gradle/
 local.properties
-gradle.properties
 
 # IDE files
 .idea/
@@ -18,3 +16,16 @@ gradle.properties
 # Keystore
 *.jks
 *.keystore
+
+# OS files
+desktop.ini
+Thumbs.db
+.DS_Store
+
+# Misc
+*.log
+*.tmp
+
+# Exclude website and social guide from repository
+website/
+SOCIAL.md

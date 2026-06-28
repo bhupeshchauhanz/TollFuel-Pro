@@ -73,7 +73,7 @@ public class HomeFragment extends Fragment {
         tvTotalSpent.setText(getString(R.string.rupee_amount, (int) totalSpent));
         tvDistance.setText(getString(R.string.km_amount, (int) totalKm));
         tvTrips.setText(String.valueOf(trips.size()));
-        tvTollPlazas.setText(String.valueOf(1169));
+        tvTollPlazas.setText(String.valueOf(getResources().getInteger(R.integer.total_toll_plazas)));
         tvTollCosts.setText(getString(R.string.rupee_amount, (int) totalToll));
         tvFuelCosts.setText(getString(R.string.rupee_amount, (int) totalFuel));
 
@@ -141,6 +141,7 @@ public class HomeFragment extends Fragment {
             }
 
             itemView.setOnClickListener(v -> {
+                if (!isAdded() || getActivity() == null) return;
                 TripResultFragment fragment = TripResultFragment.newInstance(trip);
                 requireActivity().getSupportFragmentManager().beginTransaction()
                         .replace(R.id.fragment_container, fragment)

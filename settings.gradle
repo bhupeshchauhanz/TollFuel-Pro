@@ -13,14 +13,16 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
-        maven {
-            url = uri('https://api.mapbox.com/downloads/v2/releases/maven')
-            authentication {
-                basic(BasicAuthentication)
-            }
-            credentials {
-                username = "mapbox"
-                password = "${MAPBOX_DOWNLOADS_TOKEN}"
+        if (hasProperty('MAPBOX_DOWNLOADS_TOKEN') && !MAPBOX_DOWNLOADS_TOKEN.isEmpty()) {
+            maven {
+                url = uri('https://api.mapbox.com/downloads/v2/releases/maven')
+                authentication {
+                    basic(BasicAuthentication)
+                }
+                credentials {
+                    username = "mapbox"
+                    password = "${MAPBOX_DOWNLOADS_TOKEN}"
+                }
             }
         }
     }
