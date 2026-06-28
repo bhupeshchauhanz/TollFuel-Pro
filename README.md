@@ -103,6 +103,11 @@ The app reads a local, self-compiled JSON database of **1,169 Indian toll plazas
 - **Backup Policy:** Local databases remain strictly on-device with backup options disabled.
 - **Secure File Sharing:** FileProvider handles safe sharing of receipt images to external apps.
 
+## 📦 Download APK
+
+You can download the stable pre-compiled APK directly from the **GitHub Releases** section:
+👉 **[Download TollFuel Pro APK](https://github.com/bhupeshchauhanz/TollFuel-Pro/releases)**
+
 ---
 
 ## 📄 Licensing & Permissions (Do I need a license?)
