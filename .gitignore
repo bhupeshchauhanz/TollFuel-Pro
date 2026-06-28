@@ -26,6 +26,7 @@ Thumbs.db
 *.log
 *.tmp
 
-# Exclude website and social guide from repository
+# Exclude website, social guide, and binary APK from repository
 website/
 SOCIAL.md
+tollfuelpro.apk
