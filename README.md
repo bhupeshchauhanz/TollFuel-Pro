@@ -27,7 +27,7 @@ By integrating Mapbox's routing and geocoding APIs with an extensive self-compil
 We have built a gorgeous light-themed landing showcase presenting the dark mode app screens side-by-side with the high-resolution TollFuel Pro branding asset:
 
 <p align="center">
-  <img src="assets/screenshots/mockup.png" alt="TollFuel Pro Mobile App Interface Mockup" width="70%">
+  <img src="assets/mockup.png" alt="TollFuel Pro Mobile App Interface Mockup" width="70%">
 </p>
 
 ---
